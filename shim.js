@@ -2,10 +2,12 @@
    Substitui o window.claude.use(...) da versão Claude por Firebase (login Google + Firestore),
    para o resto da app funcionar sem alterações. */
 (function () {
+  // O endereço antigo (GitHub Pages) passa para o novo, onde o login funciona também no iPhone.
+  if (location.hostname.endsWith("github.io")) { location.replace("https://preps-collect-lx-factory.web.app/"); return; }
   const OWNER = "igorrobertorbr@gmail.com";
   firebase.initializeApp({
     apiKey: "AIzaSyAdojLWudrq036VReTt1SSyOl2gSYPhmzk",
-    authDomain: "preps-collect-lx-factory.firebaseapp.com",
+    authDomain: "preps-collect-lx-factory.web.app",
     projectId: "preps-collect-lx-factory",
     storageBucket: "preps-collect-lx-factory.firebasestorage.app",
     messagingSenderId: "669168836322",

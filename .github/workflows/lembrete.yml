@@ -2,8 +2,8 @@ name: Lembrete da contagem
 
 on:
   schedule:
-    # 16h em Lisboa: 15h UTC no verão, 16h UTC no inverno. O script confirma a hora.
-    - cron: "5 15,16 * * *"
+    # Horas em UTC, a cobrir o verão e o inverno de Lisboa. O script confirma o dia e a hora.
+    - cron: "30 22,23,0,1,2 * * *"
   workflow_dispatch:
     inputs:
       teste:

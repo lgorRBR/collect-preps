@@ -1,0 +1,37 @@
+name: Lembrete da contagem
+
+on:
+  schedule:
+    # 16h em Lisboa: 15h UTC no verão, 16h UTC no inverno. O script confirma a hora.
+    - cron: "5 15,16 * * *"
+  workflow_dispatch:
+    inputs:
+      teste:
+        description: "Enviar um aviso de teste agora"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  actions: write
+
+jobs:
+  lembrete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-audit --no-fund --prefix .github/notify firebase-admin@13
+      - run: node .github/notify/lembrete.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          TESTE: ${{ inputs.teste == true }}
+      # o GitHub desliga horários em repositórios parados há 60 dias: isto mantém-no ligado
+      - name: Manter o horário ativo
+        if: always()
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/lembrete.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}

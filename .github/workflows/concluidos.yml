@@ -1,0 +1,35 @@
+name: Avisos de tarefas concluidas
+
+on:
+  schedule:
+    # O GitHub pode atrasar estas execuções, sobretudo nas horas de maior uso.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: concluidos
+  cancel-in-progress: false
+
+jobs:
+  concluidos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-audit --no-fund --prefix .github/notify firebase-admin@13
+      - run: node .github/notify/concluidos.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # o GitHub desliga horários em repositórios parados há 60 dias: isto mantém-no ligado
+      - name: Manter o horário ativo
+        if: always()
+        run: gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/concluidos.yml/enable"
+        env:
+          GH_TOKEN: ${{ github.token }}
